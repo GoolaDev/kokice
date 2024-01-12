@@ -7,6 +7,8 @@ You pick (click on  a number) and mpv player starts it. Teams now have to guess 
 
 How to use?
 
+First, make sure php server(QuickPHP is included) and mpv ara properly installed. Check ./bin/folder/readme.txt
+
 Collect media files and put them in **./www/media/** folder
 Execute **./start.bat** and it will launch your default browser and mpv which will play _VideoTestSignal.mp4
 

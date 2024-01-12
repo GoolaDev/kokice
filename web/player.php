@@ -6,7 +6,7 @@
     <body>
 <?php
   
-  function statusReport($message,$dieNow=false)
+    function statusReport($message,$dieNow=false)
     {
         echo "<p><b>STATUS=".$message.".</b></p>";
         if ($dieNow) die(1);
@@ -123,8 +123,10 @@
         
         return true;
     }
+    /// constants
     const playedMediaFile = '_playedmedia.txt'; // in webroot
-          
+    const mpvFileWithPath = '..\\bin\\mpv.exe';
+    
     $input = isset($_GET['medianame']) ? $_GET['medianame'] : '';
     $input = strip_tags($input);
     $input = stripslashes($input);
@@ -138,7 +140,7 @@
     
     killMpv();
 
-    $exeFile='start "" /B "..\\bin\\mpv.exe" --input-ipc-server=\\\\.\\pipe\\mpvkviz --no-osc --screen=1 --title="KVIZ - NVO ORKA" --no-terminal --hwdec=auto --cuda-decode-device=auto --window-maximized=yes '.$mediaFileWithPath;
+    $exeFile='start "" /B '.mpvFileWithPath.' --input-ipc-server=\\\\.\\pipe\\mpvkviz --no-osc --screen=1 --title="KVIZ - NVO ORKA" --no-terminal --hwdec=auto --cuda-decode-device=auto --window-maximized=yes '.$mediaFileWithPath;
     
     // $output=null;
     // $retval=null;
