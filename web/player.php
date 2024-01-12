@@ -138,7 +138,7 @@
     
     killMpv();
 
-    $exeFile='start "" /B "..\\bin\\mpv.exe" --input-ipc-server=\\\\.\\pipe\\mpvkviz --no-osc --screen=1 --title="KVIZ - N.V.O ORKA" --no-terminal --hwdec=auto --cuda-decode-device=auto --window-maximized=yes '.$mediaFileWithPath;
+    $exeFile='start "" /B "..\\bin\\mpv.exe" --input-ipc-server=\\\\.\\pipe\\mpvkviz --no-osc --screen=1 --title="KVIZ - NVO ORKA" --no-terminal --hwdec=auto --cuda-decode-device=auto --window-maximized=yes '.$mediaFileWithPath;
     
     // $output=null;
     // $retval=null;
