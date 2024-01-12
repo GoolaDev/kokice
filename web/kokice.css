@@ -1,0 +1,65 @@
+@import url(https://fonts.googleapis.com/css?family=Roboto);
+
+html, body{
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    margin-top: 2px;
+    padding: 0;
+    font-family: 'Roboto', sans-serif;
+    text-align: center;
+    background-color: rgb(26, 167, 192);
+}
+
+#score_table_container{
+    margin-bottom: 1%;
+}
+
+#scoretable{
+    border:thick solid black;
+    margin-left: auto;
+    margin-right: auto;
+    background-color: #f9fd08;
+    padding-top:10px;
+    padding-bottom: 10px;
+  
+}
+
+.teamname, .tdscore{
+    font-weight: 900;
+    text-align: center;
+}
+
+.teamname{
+    background-color: white;
+}
+
+.tdscore{
+    padding-left: 2ch;
+    padding-right: 1ch;
+}
+
+.button{
+    border: none;
+    color: black;
+    border-radius: 50%;
+    box-shadow: 5px 5px 5px 5px rgba(219, 31, 5, 1), 5px 5px 5px 5px rgba(4, 247, 36, 0.9);
+    font-size: 20px;
+    font-weight: 700;
+    margin: 0px 10px 10px 0px;
+    min-width: 70px;
+    min-height: 70px;
+    display: inline-block;
+    cursor: pointer;
+}
+
+.button_on{
+    text-decoration-line: none;
+    background-color: yellow;
+}
+
+.button_off{
+    text-decoration-line: line-through;
+    box-shadow: none;
+    background-color: rgb(26, 167, 192);
+}
