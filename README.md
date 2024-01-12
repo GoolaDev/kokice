@@ -1,11 +1,13 @@
 # Orka's pub quiz
 
-This is a web app based on dart,html and css with a small back-end done in php.
+This is a web app based on dart,with a touch of html and css with a small back-end done in php.
 It is made for windows but can be adapted for nix as well (see the bin folder and player.php).
 It uses a bunch of media files (like movie inserts and trailers) for teams to guess.
 You pick (click on  a number) and mpv player starts it. Teams now have to guess the movie/song name, director, author, ....
 
 How to use?
+
+First, make sure php server(QuickPHP is included) and mpv ara properly installed. Check ./bin/folder/readme.txt
 
 Collect media files and put them in **./www/media/** folder
 Execute **./start.bat** and it will launch your default browser and mpv which will play _VideoTestSignal.mp4

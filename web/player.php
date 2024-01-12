@@ -2,11 +2,12 @@
 <html lang="en" xml:lang="en">
     <head>
         <title><?php echo $_SERVER['PHP_SELF']; ?></title>
+        <meta charset=”utf-8”/>
     </head>
     <body>
 <?php
   
-  function statusReport($message,$dieNow=false)
+    function statusReport($message,$dieNow=false)
     {
         echo "<p><b>STATUS=".$message.".</b></p>";
         if ($dieNow) die(1);
@@ -15,20 +16,20 @@
     function killMpv()
     {
         $command = "{ \"command\": [\"quit\",\"1\"] }\n";
-        $mvppipe = @fopen('\\\\.\\pipe\\mpvkviz', 'r+');
-        if (!$mvppipe)
+        $mvppipeFP = @fopen(mvppipe, 'r+');
+        if (!$mvppipeFP)
         {
             // nothing to pipe
             return;
         }
-        fwrite($mvppipe, $command);
-        fclose($mvppipe);
+        fwrite($mvppipeFP, $command);
+        fclose($mvppipeFP);
     }
     
     function killMpv2()
     {
-        $mvppipe = '\\\\.\\pipe\\mpvkviz';
-        exec('echo quit>>'.$mvppipe);
+        
+        exec('echo quit>>'.mvppipe);
     }
     
     function killMpv3()
@@ -123,8 +124,12 @@
         
         return true;
     }
+    /// constants
     const playedMediaFile = '_playedmedia.txt'; // in webroot
-          
+    const mpvFileWithPath = '..\\bin\\mpv.exe';
+    const mvppipe = '\\\\.\\pipe\\mpvkviz';
+    const mediaListFile = '_medialist.txt';
+    
     $input = isset($_GET['medianame']) ? $_GET['medianame'] : '';
     $input = strip_tags($input);
     $input = stripslashes($input);
@@ -138,12 +143,12 @@
     
     killMpv();
 
-    $exeFile='start "" /B "..\\bin\\mpv.exe" --input-ipc-server=\\\\.\\pipe\\mpvkviz --no-osc --screen=1 --title="KVIZ - NVO ORKA" --no-terminal --hwdec=auto --cuda-decode-device=auto --window-maximized=yes '.$mediaFileWithPath;
+    $exeFile='start "" /B '.mpvFileWithPath.' --input-ipc-server='.mvppipe.' --no-osc --screen=1 --title="KVIZ - NVO ORKA" --no-terminal --hwdec=auto --cuda-decode-device=auto --window-maximized=yes '.$mediaFileWithPath;
     
     // $output=null;
     // $retval=null;
     // $result = exec($exeFile, &$output, &$retval);
-    if (logUsedMedia(playedMediaFile,$mediaFile)) statusReport("OK",false);
+    if (logUsedMedia(playedMediaFile,$mediaFile)) { statusReport("OK",false); }
     pclose(popen($exeFile,"r"));
 
 ?>
