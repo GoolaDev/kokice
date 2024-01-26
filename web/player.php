@@ -15,7 +15,7 @@
     function killMpv()
     {
         $command = "{ \"command\": [\"quit\",\"1\"] }\n";
-        $mvppipe = @fopen('\\\\.\\pipe\\mpvkviz', 'r+');
+        $mvppipe = @fopen(mvppipe, 'r+');
         if (!$mvppipe)
         {
             // nothing to pipe
@@ -27,8 +27,8 @@
     
     function killMpv2()
     {
-        $mvppipe = '\\\\.\\pipe\\mpvkviz';
-        exec('echo quit>>'.$mvppipe);
+        
+        exec('echo quit>>'.mvppipe);
     }
     
     function killMpv3()
@@ -58,7 +58,7 @@
     
     function inputFilter($inputString)
     {
-        $pattern = '/[\\w\\(\\)\\.\\-\',]/';
+        $pattern = '/[\\w\\(\\)\\.\\-\',&]/';
         
         for ($i = 0; $i < strlen($inputString) && $i<80 ; $i++)
         {
@@ -123,13 +123,36 @@
         
         return true;
     }
+    function checkFileType($mediaFilePathName)
+    {   // *****  MAKE SURE THAT AUDIO ONLY FILEs DO NOT HAVE ANY IMAGES EMBEDDED. *****
+        
+        $command = 'start "" /B '.ffprobeFileWithPath. ' -loglevel error -show_entries stream=codec_type -of json '.$mediaFilePathName;
+        $output = shell_exec($command);
+        
+        $streamsArray = json_decode($output, true);
+        
+        // if ($streamsArray['streams'][0]['codec_type']==null) echo 'code_type_0: NULL<br>'; else { echo ($streamsArray['streams'][0]['codec_type']);echo "<br>"; }
+        // if ($streamsArray['streams'][1]['codec_type']==null) echo 'code_type_1: NULL<br>'; else { echo ($streamsArray['streams'][1]['codec_type']);echo "<br>"; }
+        
+        if ( ($streamsArray['streams'][0]['codec_type']=='video') || ($streamsArray['streams'][1]['codec_type']=='video') ) 
+            return "video";//( $videoParam = '--window-maximized=yes ' ); // it's a video(+maybe audio)
+        //return ( $audioParam = '--window-minimized=yes ' );
+        if ( ($streamsArray['streams'][0]['codec_type']=='audio') || ($streamsArray['streams'][1]['codec_type']=='audio') )
+            return "audio";
+        
+        return null;
+        // "audio" means audio only, "video" can be video or video+audio
+    }
+
     /// constants
     const playedMediaFile = '_playedmedia.txt'; // in webroot
     const mpvFileWithPath = '..\\bin\\mpv.exe';
+    const ffprobeFileWithPath = '..\\bin\\ffprobe.exe';
+    const mvppipe = '\\\\.\\pipe\\mpvkviz';
     
     $input = isset($_GET['medianame']) ? $_GET['medianame'] : '';
     $input = strip_tags($input);
-    $input = stripslashes($input);
+    $input = escapeshellcmd(stripslashes($input));
         
     if (!(strlen($input)>0) || !inputFilter($input)) statusReport("FILTER ERROR. BAD INPUT. $Input: ".$input,true);
     
@@ -137,19 +160,20 @@
     $mediaFileWithPath='.\\media\\'.$mediaFile;
     
     if (!isMediaNameExists2($mediaFileWithPath)) statusReport("MEDIA NOT FOUND. Media File: ".$mediaFile,true);
-    
     killMpv();
-
-    $exeFile='start "" /B '.mpvFileWithPath.' --input-ipc-server=\\\\.\\pipe\\mpvkviz --no-osc --screen=1 --title="KVIZ - NVO ORKA" --no-terminal --hwdec=auto --cuda-decode-device=auto --window-maximized=yes '.$mediaFileWithPath;
     
+    $winSizeParam = '--window-maximized=yes ';
+    
+    if ( checkFileType($mediaFileWithPath) == "video" ) $winSizeParam = '--window-maximized=yes ';
+    if ( checkFileType($mediaFileWithPath) == "audio" ) $winSizeParam = '--window-minimized=yes ';
+ 
+    $exeFile='start "" /B '.mpvFileWithPath.' --input-ipc-server='.mvppipe.' --no-osc --screen=1 --title="KVIZ - NVO ORKA" --no-terminal --hwdec=auto --cuda-decode-device=auto '.$winSizeParam.$mediaFileWithPath;
+  
     // $output=null;
     // $retval=null;
     // $result = exec($exeFile, &$output, &$retval);
     if (logUsedMedia(playedMediaFile,$mediaFile)) statusReport("OK",false);
     pclose(popen($exeFile,"r"));
-
 ?>
-
     </body>
 </html>
-
