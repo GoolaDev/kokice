@@ -162,7 +162,7 @@
     if (!isMediaNameExists2($mediaFileWithPath)) statusReport("MEDIA NOT FOUND. Media File: ".$mediaFile,true);
     killMpv();
     
-    $winSizeParam = '--window-maximized=yes ';
+    $winSizeParam = '--window-maximized=yes '; // remove this line if you want to use $winSizeParam
     
     if ( checkFileType($mediaFileWithPath) == "video" ) $winSizeParam = '--window-maximized=yes ';
     if ( checkFileType($mediaFileWithPath) == "audio" ) $winSizeParam = '--window-minimized=yes ';
