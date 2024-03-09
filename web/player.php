@@ -59,7 +59,7 @@
     
     function inputFilter($inputString)
     {
-        $pattern = '/[\\w\\(\\)\\.\\-\',]/';
+        $pattern = '/[\\w\\(\\)\\.\\-\',&]/';
         
         for ($i = 0; $i < strlen($inputString) && $i<80 ; $i++)
         {
@@ -67,7 +67,7 @@
             
             $result = preg_match($pattern,$char);
             //echo "<p>".$char." ".$result."</p>";
-            if ($result) continue;
+            if ($result) { continue; }
             //echo "<p>Filter status:bad input</p>";
             return false; // invalid input found
         }
@@ -79,9 +79,9 @@
         try
         {
             $mediaArray = @file($mediaFile,FILE_IGNORE_NEW_LINES);
-            if ($mediaArray===false) throw new Exception("MEDIA FILE ERROR");
-            if (!(count($mediaArray)>0)) throw new Exception("MEDIA ARR 0");
-        } 
+            if ($mediaArray===false) { throw new Exception("MEDIA FILE ERROR"); }
+            if (!(count($mediaArray)>0)) { throw new Exception("MEDIA ARR 0"); }
+        }
         catch(Exception $e)
         {
             statusReport($e->getMessage(),true);
@@ -98,7 +98,7 @@
     // checks for raw file existance
     function isMediaNameExists(&$mediaName)
     {
-        if (file_exists($mediaName)) return true;
+        if (file_exists($mediaName)) { return true; }
         return false;
     }
     
@@ -132,7 +132,7 @@
     
     $input = isset($_GET['medianame']) ? $_GET['medianame'] : '';
     $input = strip_tags($input);
-    $input = stripslashes($input);
+    $input = escapeshellcmd(stripslashes($input));
         
     if (!(strlen($input)>0) || !inputFilter($input)) statusReport("FILTER ERROR. BAD INPUT. $Input: ".$input,true);
     
@@ -145,14 +145,18 @@
 
     $exeFile='start "" /B '.mpvFileWithPath.' --input-ipc-server='.mvppipe.' --no-osc --screen=1 --title="KVIZ - NVO ORKA" --no-terminal --hwdec=auto --cuda-decode-device=auto --window-maximized=yes '.$mediaFileWithPath;
     
+    $winSizeParam = '--window-maximized=yes '; // remove this line if you want to use $winSizeParam
+    
+    if ( checkFileType($mediaFileWithPath) == "video" ) $winSizeParam = '--window-maximized=yes ';
+    if ( checkFileType($mediaFileWithPath) == "audio" ) $winSizeParam = '--window-minimized=yes ';
+ 
+    $exeFile='start "" /B '.mpvFileWithPath.' --input-ipc-server='.mvppipe.' --no-osc --screen=1 --title="KVIZ - NVO ORKA" --no-terminal --hwdec=auto --cuda-decode-device=auto '.$winSizeParam.$mediaFileWithPath;
+  
     // $output=null;
     // $retval=null;
     // $result = exec($exeFile, &$output, &$retval);
     if (logUsedMedia(playedMediaFile,$mediaFile)) { statusReport("OK",false); }
     pclose(popen($exeFile,"r"));
-
 ?>
-
     </body>
 </html>
-
