@@ -133,7 +133,7 @@
         
         $streamsArray = json_decode($output, true);
         
-        if ( ($streamsArray['streams'][0]['codec_type']=='video') || ($streamsArray['streams'][1]['codec_type']=='video') ) 
+        if ( ($streamsArray['streams'][0]['codec_type']=='video') || ($streamsArray['streams'][1]['codec_type']=='video') )
             return "video";//( $videoParam = '--window-maximized=yes ' ); // it's a video(+maybe audio)
         //return ( $audioParam = '--window-minimized=yes ' );
         
