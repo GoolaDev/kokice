@@ -7,10 +7,10 @@ You pick (click on  a number) and mpv player starts it. Teams now have to guess 
 
 How to use?
 
-First, make sure php server(QuickPHP is included) and mpv ara properly installed. Check ./bin/folder/readme.txt
+First, make sure php server(QuickPHP is included) and mpv ara properly installed. Check **./bin/readme.txt**
 
-Collect media files and put them in **./www/media/** folder
-Execute **./start.bat** and it will launch your default browser and mpv which will play _VideoTestSignal.mp4
+Collect media files and put them in **./web/media/** folder
+On Windows execute **./start.bat** and it will launch your default browser and mpv.exe which will play _VideoTestSignal.mp4
 
 In Browser window enter team names. For teams that are not used enter blank name.
 Blank means no chars whatsoever. To award a point to a team click the number next to it while
@@ -20,6 +20,6 @@ The last entry in it, is the last one opened (by clicking a number).
 
 **Warning:**
 If you run a php server on public/private interface and not loopback only, then anyone
-with access to that IP can browse to the http://IP:8080/_playedmedia.txt and see the filename being played by mpv.
+with access to that IP can browse to the http://ip:8080/_playedmedia.txt and see the filename being played by mpv.
 
 

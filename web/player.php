@@ -1,3 +1,4 @@
+<?php /* $ sudo php --server localhost:8080 --docroot  . */ ?>
 <!DOCTYPE html>
 <html lang="en" xml:lang="en">
     <head>
@@ -128,7 +129,8 @@
     function checkFileType($mediaFilePathName)
     {   // *****  MAKE SURE THAT AUDIO ONLY FILEs DO NOT HAVE ANY IMAGES EMBEDDED. *****
         
-        $command = 'start "" /B '.ffprobeFileWithPath. ' -loglevel error -show_entries stream=codec_type -of json '.$mediaFilePathName;
+        if (file_exists('..\\bin\\ffprobe.exe')) $ffprobeFileWithPath ='..\\bin\\ffprobe.exe'; else $ffprobeFileWithPath='ffprobe';
+        $command = 'start "" /B '.$ffprobeFileWithPath. ' -loglevel error -show_entries stream=codec_type -of json '.$mediaFilePathName;
         $output = shell_exec($command);
         
         $streamsArray = json_decode($output, true);
@@ -143,12 +145,11 @@
         return null;
         // "audio" means audio only, "video" can be video or video+audio
     }
-    /// constants
+
+    if (file_exists('..\\bin\\mpv.exe')) $mpvBinaryWithPath ='..\\bin\\mpv.exe'; else $mpvBinaryWithPath='mpv';
+    
     const playedMediaFile = '_playedmedia.txt'; // in webroot
-    const mpvFileWithPath = '..\\bin\\mpv.exe';
-    const ffprobeFileWithPath = '..\\bin\\ffprobe.exe';
     const mvppipe = '\\\\.\\pipe\\mpvkviz';
-    const mediaListFile = '_medialist.txt'; // not used
     
     $input = isset($_GET['medianame']) ? $_GET['medianame'] : '';
     $input = strip_tags($input);
@@ -159,7 +160,7 @@
     $mediaFile=$input;
     $mediaFileWithPath='.\\media\\'.$mediaFile;
     
-    if (!isMediaNameExists($mediaFileWithPath)) statusReport("MEDIA NOT FOUND. Media File: ".$mediaFile,true);
+    if (!file_exists($mediaFileWithPath)) statusReport("MEDIA NOT FOUND. Media File: ".$mediaFile,true);
     
     killMpv();
 /*
@@ -167,7 +168,7 @@
     if ( checkFileType($mediaFileWithPath) == "audio" ) $winSizeParam = '--window-minimized=yes ';
  */
     $winSizeParam = '--window-maximized=yes ';
-    $exeFile='start "" /B '.mpvFileWithPath.' --input-ipc-server='.mvppipe.' --no-osc --screen=1 --title="KVIZ - NVO ORKA" --no-terminal --hwdec=auto --cuda-decode-device=auto '.$winSizeParam.$mediaFileWithPath;
+    $exeFile='start "" /B '.$mpvBinaryWithPath.' --input-ipc-server='.mvppipe.' --no-osc --screen=1 --title="KVIZ - NVO ORKA" --no-terminal --hwdec=auto --cuda-decode-device=auto '.$winSizeParam.$mediaFileWithPath;
   
     // $output=null;
     // $retval=null;
