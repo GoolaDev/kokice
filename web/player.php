@@ -124,9 +124,29 @@
         
         return true;
     }
+    
+    function checkFileType($mediaFilePathName)
+    {   // *****  MAKE SURE THAT AUDIO ONLY FILEs DO NOT HAVE ANY IMAGES EMBEDDED. *****
+        
+        $command = 'start "" /B '.ffprobeFileWithPath. ' -loglevel error -show_entries stream=codec_type -of json '.$mediaFilePathName;
+        $output = shell_exec($command);
+        
+        $streamsArray = json_decode($output, true);
+        
+        if ( ($streamsArray['streams'][0]['codec_type']=='video') || ($streamsArray['streams'][1]['codec_type']=='video') ) 
+            return "video";//( $videoParam = '--window-maximized=yes ' ); // it's a video(+maybe audio)
+        //return ( $audioParam = '--window-minimized=yes ' );
+        
+        if ( ($streamsArray['streams'][0]['codec_type']=='audio') || ($streamsArray['streams'][1]['codec_type']=='audio') )
+            return "audio";
+        
+        return null;
+        // "audio" means audio only, "video" can be video or video+audio
+    }
     /// constants
     const playedMediaFile = '_playedmedia.txt'; // in webroot
     const mpvFileWithPath = '..\\bin\\mpv.exe';
+    const ffprobeFileWithPath = '..\\bin\\ffprobe.exe';
     const mvppipe = '\\\\.\\pipe\\mpvkviz';
     const mediaListFile = '_medialist.txt';
     
@@ -142,14 +162,11 @@
     if (!isMediaNameExists($mediaFileWithPath)) statusReport("MEDIA NOT FOUND. Media File: ".$mediaFile,true);
     
     killMpv();
-
-    $exeFile='start "" /B '.mpvFileWithPath.' --input-ipc-server='.mvppipe.' --no-osc --screen=1 --title="KVIZ - NVO ORKA" --no-terminal --hwdec=auto --cuda-decode-device=auto --window-maximized=yes '.$mediaFileWithPath;
-    
-    $winSizeParam = '--window-maximized=yes '; // remove this line if you want to use $winSizeParam
-    
+/*
     if ( checkFileType($mediaFileWithPath) == "video" ) $winSizeParam = '--window-maximized=yes ';
     if ( checkFileType($mediaFileWithPath) == "audio" ) $winSizeParam = '--window-minimized=yes ';
- 
+ */
+    $winSizeParam = '--window-maximized=yes ';
     $exeFile='start "" /B '.mpvFileWithPath.' --input-ipc-server='.mvppipe.' --no-osc --screen=1 --title="KVIZ - NVO ORKA" --no-terminal --hwdec=auto --cuda-decode-device=auto '.$winSizeParam.$mediaFileWithPath;
   
     // $output=null;
