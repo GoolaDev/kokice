@@ -74,7 +74,7 @@
         return true; // filter passed OK!
     }
     
-    function isMediaNameExists(&$mediaName,$mediaFile)
+    function isMediaNameExists2(&$mediaName,$mediaFile)
     {
         try
         {
@@ -96,7 +96,7 @@
         return false;
     }
     // checks for raw file existance
-    function isMediaNameExists2(&$mediaName)
+    function isMediaNameExists(&$mediaName)
     {
         if (file_exists($mediaName)) return true;
         return false;
@@ -139,7 +139,7 @@
     $mediaFile=$input;
     $mediaFileWithPath='.\\media\\'.$mediaFile;
     
-    if (!isMediaNameExists2($mediaFileWithPath)) statusReport("MEDIA NOT FOUND. Media File: ".$mediaFile,true);
+    if (!isMediaNameExists($mediaFileWithPath)) statusReport("MEDIA NOT FOUND. Media File: ".$mediaFile,true);
     
     killMpv();
 
