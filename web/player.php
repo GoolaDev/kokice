@@ -148,7 +148,7 @@
     const mpvFileWithPath = '..\\bin\\mpv.exe';
     const ffprobeFileWithPath = '..\\bin\\ffprobe.exe';
     const mvppipe = '\\\\.\\pipe\\mpvkviz';
-    const mediaListFile = '_medialist.txt';
+    const mediaListFile = '_medialist.txt'; // not used
     
     $input = isset($_GET['medianame']) ? $_GET['medianame'] : '';
     $input = strip_tags($input);
