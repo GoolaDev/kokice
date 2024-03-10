@@ -20,7 +20,7 @@ for file in "."/*; do
 	fi
 done
 
-#conver \n to \r\n
+#convert \n to \r\n
 sed -i -e 's/\r*$/\r/' ../$mediaListFile 
 # Bring web server online. Here php built in web server is used.
 # php --server "$bindIp:$Port" --docroot ./web
