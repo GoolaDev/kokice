@@ -1,0 +1,28 @@
+#!/bin/bash
+
+bindIp=0.0.0.0
+Port=8080
+bindir="./bin"
+webroot="./web"
+mediaDir="$webroot/media"
+mediaListFile="_medialist.txt"
+homeDir=$(pwd)
+#Populate mediaListFile with file names from $mediaDir
+if [ -f "$webroot/$mediaListFile" ]; then 
+    rm -rf "$webroot/$mediaListFile"
+fi
+
+cd $mediaDir
+# for file in "$mediaDir"/*; do
+for file in "."/*; do
+	if [ -f "$file" ]; then 
+	echo "$file"|cut -c 3->>../$mediaListFile
+	fi
+done
+
+#conver \n to \r\n
+sed -i -e 's/\r*$/\r/' ../$mediaListFile 
+# Bring web server online. Here php built in web server is used.
+# php --server "$bindIp:$Port" --docroot ./web
+ 
+php --server "$bindIp:$Port" -t "$homeDir/web"

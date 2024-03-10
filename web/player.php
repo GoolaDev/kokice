@@ -7,7 +7,13 @@
     </head>
     <body>
 <?php
-  
+    
+    function consoleLog($message,$dieNow=false)
+    {
+        error_log($message, 4);
+        if ($dieNow) die(1);
+    }
+
     function statusReport($message,$dieNow=false)
     {
         echo "<p><b>STATUS=".$message.".</b></p>";
@@ -33,49 +39,21 @@
         exec('echo quit>>'.mvppipe);
     }
     
-    function killMpv3()
-    { // has performance issues
-        $taskname='mpv.exe';
-        $found=true;
-        while($found)
-        {
-            $task_list = array();
-            exec("start /B tasklist 2>NUL", $task_list);
-            foreach ($task_list as &$task)
-            {
-                if (strpos($task, $taskname) !== false)
-                {
-                    exec('..\\bin\\SendKeys.exe "ORKA" "%{F4}"');
-                    $found = true;
-                    break;
-                }
-                else
-                {
-                    $found = false;
-                }
-            }
-        }
-        unset($task);
-    }
-    
     function inputFilter($inputString)
     {
-        $pattern = '/[\\w\\(\\)\\.\\-\',&]/';
-        
+        $pattern = '/[\\w\\(\\)\\.\\-\',]/';
+        // Allowed: word_char ( ) . - , '
         for ($i = 0; $i < strlen($inputString) && $i<80 ; $i++)
         {
             $char = $inputString[$i];
-            
             $result = preg_match($pattern,$char);
-            //echo "<p>".$char." ".$result."</p>";
             if ($result) { continue; }
-            //echo "<p>Filter status:bad input</p>";
-            return false; // invalid input found
+            return false; // invalid input found !!!
         }
         return true; // filter passed OK!
     }
     
-    function isMediaNameExists2(&$mediaName,$mediaFile)
+    function isMediaNameExists2(&$mediaName,$mediaFile) // obsolete function
     {
         try
         {
@@ -145,20 +123,25 @@
         return null;
         // "audio" means audio only, "video" can be video or video+audio
     }
-
-    if (file_exists('..\\bin\\mpv.exe')) $mpvBinaryWithPath ='..\\bin\\mpv.exe'; else $mpvBinaryWithPath='mpv';
-    
+  
     const playedMediaFile = '_playedmedia.txt'; // in webroot
     const mvppipe = '\\\\.\\pipe\\mpvkviz';
     
     $input = isset($_GET['medianame']) ? $_GET['medianame'] : '';
     $input = strip_tags($input);
-    $input = escapeshellcmd(stripslashes($input));
-        
-    if (!(strlen($input)>0) || !inputFilter($input)) statusReport("FILTER ERROR. BAD INPUT. $Input: ".$input,true);
+    //$input = escapeshellcmd(stripslashes($input));
+
+    if (!(strlen($input)>0) || !inputFilter($input)) statusReport("FILTER ERROR. BAD INPUT: ".$input,true);
     
     $mediaFile=$input;
-    $mediaFileWithPath='.\\media\\'.$mediaFile;
+    if (file_exists('..\\bin\\mpv.exe'))
+    {
+        $mediaFileWithPath='.\\media\\'.$mediaFile;
+    }
+    else
+    { // nix
+        $mediaFileWithPath='./media/'.$mediaFile;
+    }
     
     if (!file_exists($mediaFileWithPath)) statusReport("MEDIA NOT FOUND. Media File: ".$mediaFile,true);
     
@@ -166,10 +149,19 @@
 /*
     if ( checkFileType($mediaFileWithPath) == "video" ) $winSizeParam = '--window-maximized=yes ';
     if ( checkFileType($mediaFileWithPath) == "audio" ) $winSizeParam = '--window-minimized=yes ';
- */
-    $winSizeParam = '--window-maximized=yes ';
-    $exeFile='start "" /B '.$mpvBinaryWithPath.' --input-ipc-server='.mvppipe.' --no-osc --screen=1 --title="KVIZ - NVO ORKA" --no-terminal --hwdec=auto --cuda-decode-device=auto '.$winSizeParam.$mediaFileWithPath;
-  
+*/
+    //$winSizeParam = '--window-maximized=yes ';
+    $winSizeParam = '--fs ';
+    if (file_exists('..\\bin\\mpv.exe'))
+    {   // win
+        $mpvBinaryWithPath ='..\\bin\\mpv.exe';
+        $exeFile='start "" /B '.$mpvBinaryWithPath.' --input-ipc-server='.mvppipe.' --no-osc --screen=1 --title="KVIZ - NVO ORKA" --no-terminal --hwdec=auto --cuda-decode-device=auto '.$winSizeParam.$mediaFileWithPath;
+    }
+    else
+    {   // nix
+        $mpvBinaryWithPath='mpv';
+        $exeFile=$mpvBinaryWithPath.' --input-ipc-server='.mvppipe.' --no-osc --screen=1 --title="KVIZ - NVO ORKA" --no-terminal --hwdec=auto --cuda-decode-device=auto '.$winSizeParam.'"'.$mediaFileWithPath.'"';
+    }
     // $output=null;
     // $retval=null;
     // $result = exec($exeFile, &$output, &$retval);
