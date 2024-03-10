@@ -1,4 +1,3 @@
-<?php /* $ sudo php --server localhost:8080 --docroot  . */ ?>
 <!DOCTYPE html>
 <html lang="en" xml:lang="en">
     <head>
@@ -35,7 +34,6 @@
     
     function killMpv2()
     {
-        
         exec('echo quit>>'.mvppipe);
     }
     
@@ -95,7 +93,7 @@
         // $logLine = 'TimeStamp: '.$dt->format('Y-m-d_H:i:s').' Filename: '.$logMsg.PHP_EOL;
         $logLine2 = $logMsg.' #'.$dt->format('Y-m-d_H:i:s').'#'.PHP_EOL;
         if (!fwrite($logFile, $logLine2,150))
-         {
+        {
             //header('Internal Server Error:500', true, 500);
             statusReport("FILE WRITE ERROR",false);
             return false;
