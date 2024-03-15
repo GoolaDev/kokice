@@ -162,7 +162,7 @@
     }
     
     function playMediaCommand($mediaName)
-    {   
+    {
         if (!inputFilter($mediaName)) statusReport(badInputMsg.$mediaName,true);
         
         $mediaFileWithPath = pathToMedia.$mediaName;
