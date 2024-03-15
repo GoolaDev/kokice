@@ -26,3 +26,4 @@ sed -i -e 's/\r*$/\r/' ../$mediaListFile
 # php --server "$bindIp:$Port" --docroot ./web
  
 php --server "$bindIp:$Port" -t "$homeDir/web"
+
