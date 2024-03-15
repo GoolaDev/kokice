@@ -174,12 +174,12 @@
         if (file_exists(mpvWinBinary))
         {   // Win
             killMpvWin();
-            $mpvRunLine='start "" /B '.mpvWinBinary.' --input-ipc-server='.mpvWinPipeName.' --no-osc --screen=1 --title="KVIZ - NVO ORKA" --no-terminal --hwdec=auto --cuda-decode-device=auto '.winSizeParam.$mediaFileWithPath;
+            $mpvRunLine='start "" /B '.mpvWinBinary.' --input-ipc-server='.mpvWinPipeName.' --no-osc --screen=1 --title="KVIZ - NVO ORKA" --no-terminal --hwdec=auto --cuda-decode-device=auto '.winSizeParam.'"'.$mediaFileWithPath.'"';
         }
         else
         {   // nix
             killMpvNix();
-            $mpvRunLine = mpvNixBinary.' --input-ipc-server='.mpvNixSocketName.' --no-osc --screen=1 --title="KVIZ - NVO ORKA" --no-terminal --hwdec=auto --cuda-decode-device=auto '.winSizeParam.$mediaFileWithPath.'> /dev/null 2>&1 &';
+            $mpvRunLine = mpvNixBinary.' --input-ipc-server='.mpvNixSocketName.' --no-osc --screen=1 --title="KVIZ - NVO ORKA" --no-terminal --hwdec=auto --cuda-decode-device=auto '.winSizeParam.'\''.$mediaFileWithPath.'\'> /dev/null 2>&1 &';
         }
         
         // $output=null;
