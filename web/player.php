@@ -153,7 +153,8 @@
         echo '<div id="MediaListContainer">';
         foreach ($filesArray as &$fileName)
         {
-            if (!inputFilter($fileName)) statusReport(badInputMsg.$fileName,true); //protect 
+            if (!inputFilter($fileName)) statusReport(badInputMsg.$fileName,true); //protect
+            if (strcontains($fileName,'readme') || strcontains($fileName,'README') ) continue;
             echo "$fileName<br>";
         }
         echo '</div>';
