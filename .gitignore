@@ -3,4 +3,5 @@
 .dart_tool/
 /web/_codesnapshots/
 /web/kokice.dart.js.deps
-
+/web/_playedmedia.txt
+!/web/media/README.md
