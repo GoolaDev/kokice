@@ -1,46 +1,75 @@
 <!DOCTYPE html>
 <html lang="en" xml:lang="en">
-    <head>
-        <title><?php echo $_SERVER['PHP_SELF']; ?></title>
-        <meta charset=”utf-8”/>
-    </head>
-    <body>
+<head>
+    <title><?php echo $_SERVER['PHP_SELF']; ?></title>
+    <meta charset=”utf-8”/>
+</head>
+
+<body>
 <?php
+    const playedMediaFile = '_playedmedia.txt'; // in webroot
+    const mpvWinBinary = '..\\bin\\mpv.exe';
+    const mpvNixBinary = 'mpv';
+    const mpvWinPipeName = '\\\\.\\pipe\\mpvkviz';
+    const mpvNixSocketName = '/tmp/mpvkviz.sock';
+    const killCommand = "{ \"command\": [\"quit\",\"1\"] }\n";
+    const pathToMedia = './media/';
+    const badInputMsg = "ERROR. BAD INPUT: ";
+    const winSizeParam = '--fs ';
+
+    function exitScript()
+    {
+        echo "</body></html>";
+        die(1);
+        return "null";
+    }
     
-    function consoleLog($message,$dieNow=false)
+    function logToConsole($message,$dieNow=false)
     {
         error_log($message, 4);
-        if ($dieNow) die(1);
+        if ($dieNow) exitScript();
     }
 
     function statusReport($message,$dieNow=false)
     {
         echo "<p><b>STATUS=".$message.".</b></p>";
-        if ($dieNow) die(1);
+        if ($dieNow) exitScript();
+        return "null";
     }
 
-    function killMpv()
+    function killMpvWin()
     {
-        $command = "{ \"command\": [\"quit\",\"1\"] }\n";
-        $mvppipeFP = @fopen(mvppipe, 'r+');
-        if (!$mvppipeFP)
+        $mpvpipeFP = @fopen(mpvWinPipeName, 'r+');
+        if (!$mpvpipeFP)
         {
             // nothing to pipe
             return;
         }
-        fwrite($mvppipeFP, $command);
-        fclose($mvppipeFP);
+        fwrite($mpvpipeFP, killCommand);
+        fclose($mpvpipeFP);
     }
     
-    function killMpv2()
+    function killMpvNix()
     {
-        exec('echo quit>>'.mvppipe);
+        $socket = stream_socket_client('unix://'.mpvNixSocketName, $errno, $errst);
+        if ($socket)
+        {
+            fwrite($socket, killCommand);
+            $resp = fread($socket, 256);
+            fclose($socket);
+        }
+        if (file_exists(mpvNixSocketName)) { unlink(mpvNixSocketName); }
+    }
+    function strcontains ($haystack,$needle)
+    {
+        return empty($needle) || strpos($haystack, $needle) !== false;
     }
     
     function inputFilter($inputString)
     {
-        $pattern = '/[\\w\\(\\)\\.\\-\',]/';
+        $pattern = '/[\\w\\(\\)\\.\\-`,_]/';
         // Allowed: word_char ( ) . - , '
+        if (strcontains($inputString, '..')) return false;
         for ($i = 0; $i < strlen($inputString) && $i<80 ; $i++)
         {
             $char = $inputString[$i];
@@ -70,12 +99,6 @@
             if ($item===$mediaName) { unset($item);return true; }
         }
         unset($item);
-        return false;
-    }
-    // checks for raw file existance
-    function isMediaNameExists(&$mediaName)
-    {
-        if (file_exists($mediaName)) { return true; }
         return false;
     }
     
@@ -121,50 +144,70 @@
         return null;
         // "audio" means audio only, "video" can be video or video+audio
     }
-  
-    const playedMediaFile = '_playedmedia.txt'; // in webroot
-    const mvppipe = '\\\\.\\pipe\\mpvkviz';
     
-    $input = isset($_GET['medianame']) ? $_GET['medianame'] : '';
-    $input = strip_tags($input);
-    //$input = escapeshellcmd(stripslashes($input));
-
-    if (!(strlen($input)>0) || !inputFilter($input)) statusReport("FILTER ERROR. BAD INPUT: ".$input,true);
-    
-    $mediaFile=$input;
-    if (file_exists('..\\bin\\mpv.exe'))
+    function listMediaCommand()
     {
-        $mediaFileWithPath='.\\media\\'.$mediaFile;
-    }
-    else
-    { // nix
-        $mediaFileWithPath='./media/'.$mediaFile;
+        if (!file_exists(pathToMedia)) { statusReport("Path does not exist !",true); }
+
+        $filesArray = array_diff( scandir(pathToMedia), array('.','..') );
+        echo '<div id="MediaListContainer">';
+        foreach ($filesArray as &$fileName)
+        {
+            if (!inputFilter($fileName)) statusReport(badInputMsg.$fileName,true); //protect 
+            echo "$fileName<br>";
+        }
+        echo '</div>';
+        statusReport("OK",false);
     }
     
-    if (!file_exists($mediaFileWithPath)) statusReport("MEDIA NOT FOUND. Media File: ".$mediaFile,true);
+    function playMediaCommand($mediaName)
+    {   
+        if (!inputFilter($mediaName)) statusReport(badInputMsg.$mediaName,true);
+        
+        $mediaFileWithPath = pathToMedia.$mediaName;
+        /*
+            if ( checkFileType($mediaFileWithPath) == "video" ) $winSizeParam = '--window-maximized=yes ';
+            if ( checkFileType($mediaFileWithPath) == "audio" ) $winSizeParam = '--window-minimized=yes ';
+        */
+        if (!file_exists($mediaFileWithPath)) statusReport("MEDIA NOT FOUND. Media File: ".$mediaName,true);
+        if (file_exists(mpvWinBinary))
+        {   // Win
+            killMpvWin();
+            $mpvRunLine='start "" /B '.mpvWinBinary.' --input-ipc-server='.mpvWinPipeName.' --no-osc --screen=1 --title="KVIZ - NVO ORKA" --no-terminal --hwdec=auto --cuda-decode-device=auto '.winSizeParam.$mediaFileWithPath;
+        }
+        else
+        {   // nix
+            killMpvNix();
+            $mpvRunLine = mpvNixBinary.' --input-ipc-server='.mpvNixSocketName.' --no-osc --screen=1 --title="KVIZ - NVO ORKA" --no-terminal --hwdec=auto --cuda-decode-device=auto '.winSizeParam.$mediaFileWithPath.'> /dev/null 2>&1 &';
+        }
+        
+        // $output=null;
+        // $retval=null;
+        // $result = exec($exeFile, &$output, &$retval);
+        if (logUsedMedia(playedMediaFile,$mediaName)) { statusReport("OK",false); }
+        pclose(popen($mpvRunLine,"r"));
+    }
+
+    function processInput()
+    {
+        $input = strip_tags($_SERVER['QUERY_STRING']);
+        if (!(strlen($input)>0)) statusReport(badInputMsg.'no input',true);
+        parse_str($input,$queryArray);
+        $command = (!empty($queryArray['command'])) ? $queryArray['command'] : statusReport("No command specified",true);
+        if (!inputFilter($command)) statusReport(badInputMsg.$command,true);
+        if ($command==='listMedia') { listMediaCommand(); return; }
+        if ($command==='playMedia')
+        {
+            $mName = (!empty($queryArray['medianame']))? $queryArray['medianame'] : statusReport("No media name specified",true);
+            if (!inputFilter($mName)) statusReport(badInputMsg.$mName,true);
+            playMediaCommand($mName);
+            return;
+        }
+        statusReport(badInputMsg.'unknown command',false);
+    }
     
-    killMpv();
-/*
-    if ( checkFileType($mediaFileWithPath) == "video" ) $winSizeParam = '--window-maximized=yes ';
-    if ( checkFileType($mediaFileWithPath) == "audio" ) $winSizeParam = '--window-minimized=yes ';
-*/
-    //$winSizeParam = '--window-maximized=yes ';
-    $winSizeParam = '--fs ';
-    if (file_exists('..\\bin\\mpv.exe'))
-    {   // win
-        $mpvBinaryWithPath ='..\\bin\\mpv.exe';
-        $exeFile='start "" /B '.$mpvBinaryWithPath.' --input-ipc-server='.mvppipe.' --no-osc --screen=1 --title="KVIZ - NVO ORKA" --no-terminal --hwdec=auto --cuda-decode-device=auto '.$winSizeParam.$mediaFileWithPath;
-    }
-    else
-    {   // nix
-        $mpvBinaryWithPath='mpv';
-        $exeFile=$mpvBinaryWithPath.' --input-ipc-server='.mvppipe.' --no-osc --screen=1 --title="KVIZ - NVO ORKA" --no-terminal --hwdec=auto --cuda-decode-device=auto '.$winSizeParam.'"'.$mediaFileWithPath.'"';
-    }
-    // $output=null;
-    // $retval=null;
-    // $result = exec($exeFile, &$output, &$retval);
-    if (logUsedMedia(playedMediaFile,$mediaFile)) { statusReport("OK",false); }
-    pclose(popen($exeFile,"r"));
+    processInput();
+
 ?>
-    </body>
+</body>
 </html>

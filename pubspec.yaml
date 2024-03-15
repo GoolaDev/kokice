@@ -10,6 +10,7 @@ environment:
 dependencies:
   # path: ^1.8.0
   http: ^1.1.0
+  html: 
 
 dev_dependencies:
   build_runner: ^2.4.0

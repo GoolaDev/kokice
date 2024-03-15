@@ -1,13 +1,21 @@
 import 'dart:html';
 import 'dart:math';
+import 'package:html/parser.dart' as html;
 import 'package:http/http.dart' as http;
 
 int numberOfMediaFiles = 0;
 int activeTeam = 0;
-const String mediaListFileName = "_medialist.txt";
-const String hostAndPort = "http://127.0.0.1:8080";
+const String mediaListCmd = "command=listMedia";
+const String playMediaCmd = "command=playMedia&medianame=";
+const String uri = "http://127.0.0.1:8080/player.php?";
 List<String> mediaFilesList = [];
 String? testStr ="";
+
+void logToWeb([String? msg=''])
+{
+    window.alert(msg);
+}
+
 void main() async
 {
     try 
@@ -25,13 +33,19 @@ void main() async
            querySelector(id)!.innerText = score.toString();
         }));
         
-        final Uri mediaListUri = Uri.parse('$hostAndPort/$mediaListFileName');
-        final String mediaListFile = await http.read(mediaListUri);
+        final Uri mediaListUri = Uri.parse('$uri$mediaListCmd');
+        final String mediaListFileDocument = await http.read(mediaListUri);
+        if (mediaListFileDocument.isEmpty) { throw "Content: 0"; }
+        var mediaListDocument = html.parse(mediaListFileDocument);
+        String? mediaListContainer = mediaListDocument.body?.querySelector('#MediaListContainer')?.innerHtml;
         
-        if (mediaListFile.isEmpty) { throw "Content: 0"; }
-        mediaFilesList = mediaListFile.split('\r\n') ;
+        if (mediaListContainer == null)   { throw "Could not get media list. Probaly web server issue.";  }
+        if (mediaListContainer.isEmpty) { throw "Media List empty."; }
+        
+        mediaFilesList = mediaListContainer.split('<br>') ;
         if (mediaFilesList.last.isEmpty) mediaFilesList.removeLast();
         numberOfMediaFiles = mediaFilesList.length;
+        
         mediaFilesList.shuffle(Random());
         mediaFilesList.shuffle(Random());
         mediaFilesList.shuffle(Random());
@@ -41,7 +55,7 @@ void main() async
 
     catch (error)
     {
-        window.alert("NESHTO SHTEKA.\n${error.toString()}");   
+        window.alert("Something's Wrong.\n${error.toString()}");   
     }
 }
 
@@ -87,7 +101,8 @@ void buttonsOnClickHandler(MouseEvent event) async
     try 
     { 
         final String mediaName = mediaFilesList[int.tryParse(btnElement.id)!-1];
-        final Uri mediaListUri = Uri.parse('$hostAndPort/player.php?medianame=$mediaName');
+        final Uri mediaListUri = Uri.parse('$uri$playMediaCmd$mediaName');
+        
         final serverResponse = await http.get(mediaListUri);
         
         if (serverResponse.statusCode != 200) 
