@@ -11,12 +11,12 @@ First, make sure php server(QuickPHP is included) and mpv are properly installed
 Collect media files and put them in **./web/media/** folder.
 On Windows execute **./start.bat** and it will launch your default browser and mpv.exe which will play _VideoTestSignal.mp4
 
-On Linux, execute ./start.bsh from ./kokice folder.
-Navigate to http://127.0.0.1:8080
+On Linux, execute **./start.bsh** from ./kokice folder.
+Navigate to http://IP:Port, specified in start.bat (Win),or start.bsh (*Nix).
 
 After site loads, enter team names. For teams that are not used leave it blank!
-Blank means no chars whatsoever. To award a point to a team click the number next to it while
-holding Ctrl or Alt. Ctrl+click decrements score (in case of a mistake). **Alt+click increments it.**
+Blank means no chars whatsoever. To give or take a point to a team, click the number next to it while
+holding Ctrl or Alt. **Ctrl+click** decrements score (in case of a mistake). **Alt+click increments it.**
 To see what media files have been played open  **./www/_playedmedia.txt**.
 The last entry in it, is the last one opened (by clicking a number).
 
