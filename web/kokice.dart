@@ -7,7 +7,10 @@ int numberOfMediaFiles = 0;
 int activeTeam = 0;
 const String mediaListCmd = "command=listMedia";
 const String playMediaCmd = "command=playMedia&medianame=";
-const String uri = "http://127.0.0.1:8080/player.php?";
+const String backendFileName = "player.php?";
+final String? docUri = window.document.baseUri;
+String docUrl = "";
+String partialCommandUri = "";
 List<String> mediaFilesList = [];
 String? testStr ="";
 
@@ -19,8 +22,18 @@ void logToWeb([String? msg=''])
 void main() async
 {
     try 
-    {
-        // table stuff
+    {   // Get URL
+        if (docUri!=null)
+        {
+            docUrl = docUri!.substring(0,docUri!.indexOf('kokice')); 
+        }
+        else
+        {
+            logToWeb('Get document url failed!');
+            return;
+        }
+        partialCommandUri = docUrl + backendFileName;
+        
         querySelectorAll(".tdscore").forEach((element) => element.innerText="0");
         querySelectorAll(".tdscore").forEach((element) => element.onClick.listen((MouseEvent event) 
         { 
@@ -33,7 +46,7 @@ void main() async
            querySelector(id)!.innerText = score.toString();
         }));
         
-        final Uri mediaListUri = Uri.parse('$uri$mediaListCmd');
+        final Uri mediaListUri = Uri.parse('$partialCommandUri$mediaListCmd');
         final String mediaListFileDocument = await http.read(mediaListUri);
         if (mediaListFileDocument.isEmpty) { throw "Content: 0"; }
         var mediaListDocument = html.parse(mediaListFileDocument);
@@ -101,7 +114,7 @@ void buttonsOnClickHandler(MouseEvent event) async
     try 
     { 
         final String mediaName = mediaFilesList[int.tryParse(btnElement.id)!-1];
-        final Uri mediaListUri = Uri.parse('$uri$playMediaCmd$mediaName');
+        final Uri mediaListUri = Uri.parse('$partialCommandUri$playMediaCmd$mediaName');
         
         final serverResponse = await http.get(mediaListUri);
         

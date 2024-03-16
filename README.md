@@ -22,11 +22,11 @@ The last entry in it, is the last one opened (by clicking a number).
 
 **Warning:**
 If you run a php server on public/private interface and not loopback only, then anyone
-with access to that IP can browse to the http://ip:8080/_playedmedia.txt and see the filename being played by mpv.
+with access to that IP:Port can browse to the http://ip:port/_playedmedia.txt and see 
+all the files previously launched via mpv player.
+One can also list all the media files from ./web/media.
 
 To compile kokice.dart from ./kokice folder run:
 dart compile js -O2 -o ./web/kokice.dart.js ./web/kokice.dart
 
 Issues:
-
-- Because of Cross Site Request Forgery (CSRF) the only URL that works is http://127.0.0.1:8080
