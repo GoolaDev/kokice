@@ -12,7 +12,7 @@ Collect media files and put them in **./web/media/** folder.
 On Windows execute **./start.bat** and it will launch your default browser and mpv.exe which will play _VideoTestSignal.mp4
 
 On Linux, execute **./start.bsh** from ./kokice folder.
-Navigate to http://IP:Port, specified in start.bat (Win),or start.bsh (*Nix).
+Navigate to http://IP:Port, specified in start.bat for Win and start.bsh for *Nix.
 
 After site loads, enter team names. For teams that are not used leave it blank!
 Blank means no chars whatsoever. To give or take a point to a team, click the number next to it while
