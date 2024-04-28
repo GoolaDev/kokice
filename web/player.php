@@ -57,6 +57,7 @@
             fwrite($socket, killCommand);
             $resp = fread($socket, 256);
             fclose($socket);
+            unset($resp);
         }
         if (file_exists(mpvNixSocketName)) { unlink(mpvNixSocketName); }
     }

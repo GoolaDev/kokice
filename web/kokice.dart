@@ -40,7 +40,6 @@ void main() async
            String id = (event.target as TableCellElement).id;
            id = "#$id";
            int score = int.parse( querySelector(id)!.innerText );
-           //window.alert(score.toString());
            if (event.ctrlKey) --score; 
            if (event.altKey) ++score;
            querySelector(id)!.innerText = score.toString();
@@ -58,10 +57,11 @@ void main() async
         mediaFilesList = mediaListContainer.split('<br>') ;
         if (mediaFilesList.last.isEmpty) mediaFilesList.removeLast();
         numberOfMediaFiles = mediaFilesList.length;
-        
+
         mediaFilesList.shuffle(Random());
         mediaFilesList.shuffle(Random());
         mediaFilesList.shuffle(Random());
+
         switchTeam();
         createButtons();
     }
@@ -86,33 +86,54 @@ void createButtons()
     }
 }
 
-void switchTeam()
+void switchTeam([bool forward = true])
 {   
     if ( ((querySelector('#teamnameinput1') as InputElement).value!.isEmpty) &&
          ((querySelector('#teamnameinput2') as InputElement).value!.isEmpty) &&
          ((querySelector('#teamnameinput3') as InputElement).value!.isEmpty) &&
          ((querySelector('#teamnameinput4') as InputElement).value!.isEmpty) 
     ) return; 
-    
+
     const String activeColor = "green";
     const String inactiveColor = "red";
-    activeTeam = activeTeam % 4+1;
+    
+    if (forward) 
+    {
+        activeTeam = activeTeam % 4+1;
+    }    
+    else
+    {
+        activeTeam--;
+        if (activeTeam < 1) activeTeam = 4;    
+    }
+    
     
     String thId="#teamname${activeTeam.toString()}";
     String inputId="#teamnameinput${activeTeam.toString()}";
-    
+       
     querySelectorAll('.teamname').style.backgroundColor = inactiveColor;
     querySelector(thId)!.style.backgroundColor = activeColor;
     querySelector(inputId)!.style.backgroundColor = activeColor;
-    //document.title = (querySelector(inputId) as InputElement).value!.isEmpty.toString() ;
+    
+    // if Team name is missing switch over it
     if ( (querySelector(inputId) as InputElement).value!.isEmpty ) switchTeam(); 
 }
 
 void buttonsOnClickHandler(MouseEvent event) async
 {
     ButtonElement btnElement = event.target as ButtonElement;
+    
     try 
     { 
+        if (event.ctrlKey) // makes the button not clicked
+        {
+            btnElement.classes.remove("button_off");
+            btnElement.classes.add("button_on");
+            switchTeam(false);
+            return;   
+        }
+    
+    
         final String mediaName = mediaFilesList[int.tryParse(btnElement.id)!-1];
         final Uri mediaListUri = Uri.parse('$partialCommandUri$playMediaCmd$mediaName');
         
@@ -129,7 +150,8 @@ void buttonsOnClickHandler(MouseEvent event) async
         
         btnElement.classes.remove("button_on");
         btnElement.classes.add("button_off");
-        switchTeam();
+        
+        switchTeam(true);
 
     }
     catch (error)
