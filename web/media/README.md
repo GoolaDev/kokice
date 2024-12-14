@@ -1,1 +1,1 @@
-This is where media (audio and/or video) files go. Delete AMADEUS.webm, it is for testing only.
+This is where media (audio and/or video) files go.
