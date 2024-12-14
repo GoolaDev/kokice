@@ -7,3 +7,4 @@
 /web/media/*
 !/web/media/README.md
 /.vscode/settings.json
+/_codesnapshots_and_testing/
