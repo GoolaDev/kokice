@@ -15,7 +15,7 @@
     const killCommand = "{ \"command\": [\"quit\",\"1\"] }\n";
     const pathToMedia = './media/';
     const badInputMsg = "ERROR. BAD INPUT: ";
-    const otherParams = '--fs --fs-screen=1 --terminal=no --hwdec=auto --cuda-decode-device=auto';
+    const otherParams = '--fs --fs-screen=1 --terminal=no --hwdec=auto --cuda-decode-device=auto';  
 
     function exitScript()
     {
