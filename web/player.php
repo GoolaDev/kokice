@@ -155,7 +155,7 @@
         foreach ($filesArray as &$fileName)
         {
             if (!inputFilter($fileName)) statusReport(badInputMsg.$fileName,true); //protect
-            if (strcontains($fileName,'readme') || strcontains($fileName,'README') ) continue;
+            if (strcontains( strtolower($fileName),'readme') ) continue;
             echo "$fileName<br>";
         }
         echo '</div>';
