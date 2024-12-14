@@ -180,7 +180,6 @@
             $mpvRunLine = mpvNixBinary.' --input-ipc-server='.mpvNixSocketName.' '.otherParams.' \''.$mediaFileWithPath.'\'> /dev/null 2>&1 &';
         }
         
-        
         // $output=null;
         // $retval=null;
         // $result = exec($exeFile, &$output, &$retval);
