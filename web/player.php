@@ -15,7 +15,7 @@
     const killCommand = "{ \"command\": [\"quit\",\"1\"] }\n";
     const pathToMedia = './media/';
     const badInputMsg = "ERROR. BAD INPUT: ";
-    const winSizeParam = '--fs ';
+    const otherParams = '--fs --fs-screen=1 --terminal=no --hwdec=auto --cuda-decode-device=auto';
 
     function exitScript()
     {
@@ -66,9 +66,9 @@
         return empty($needle) || strpos($haystack, $needle) !== false;
     }
     
-    function inputFilter($inputString)
+    function inputFilter($inputString) // php pattern goes inside  /[ ]/
     {
-        $pattern = '/[\\w\\(\\)\\.\\-`,_]/';
+        $pattern = '/[\\w\\(\\)\\.\\-`,]/'; //allow alphanumeric characters plus underscore,"().-`"
         // Allowed: word_char ( ) . - , '
         if (strcontains($inputString, '..')) return false;
         for ($i = 0; $i < strlen($inputString) && $i<80 ; $i++)
@@ -114,9 +114,9 @@
         }
         
         $dt = new DateTime("now",new DateTimeZone('UTC'));
-        // $logLine = 'TimeStamp: '.$dt->format('Y-m-d_H:i:s').' Filename: '.$logMsg.PHP_EOL;
-        $logLine2 = $logMsg.' #'.$dt->format('Y-m-d_H:i:s').'#'.PHP_EOL;
-        if (!fwrite($logFile, $logLine2,150))
+        //$logLine = 'TimeStamp: '.$dt->format('Y-m-d_H:i:s').' Filename: '.$logMsg.PHP_EOL;
+        $logLine = $logMsg.' #'.$dt->format('Y-m-d_H:i:s').'#'.PHP_EOL;
+        if (!fwrite($logFile, $logLine,150))
         {
             //header('Internal Server Error:500', true, 500);
             statusReport("FILE WRITE ERROR",false);
@@ -167,21 +167,19 @@
         if (!inputFilter($mediaName)) statusReport(badInputMsg.$mediaName,true);
         
         $mediaFileWithPath = pathToMedia.$mediaName;
-        /*
-            if ( checkFileType($mediaFileWithPath) == "video" ) $winSizeParam = '--window-maximized=yes ';
-            if ( checkFileType($mediaFileWithPath) == "audio" ) $winSizeParam = '--window-minimized=yes ';
-        */
+        
         if (!file_exists($mediaFileWithPath)) statusReport("MEDIA NOT FOUND. Media File: ".$mediaName,true);
         if (file_exists(mpvWinBinary))
         {   // Win
             killMpvWin();
-            $mpvRunLine='start "" /B '.mpvWinBinary.' --input-ipc-server='.mpvWinPipeName.' --no-osc --screen=1 --title="KVIZ - NVO ORKA" --no-terminal --hwdec=auto --cuda-decode-device=auto '.winSizeParam.'"'.$mediaFileWithPath.'"';
+            $mpvRunLine='start "" /B '.mpvWinBinary.' --input-ipc-server='.mpvWinPipeName.' '.otherParams.' "'.$mediaFileWithPath.'"';
         }
         else
         {   // nix
             killMpvNix();
-            $mpvRunLine = mpvNixBinary.' --input-ipc-server='.mpvNixSocketName.' --no-osc --screen=1 --title="KVIZ - NVO ORKA" --no-terminal --hwdec=auto --cuda-decode-device=auto '.winSizeParam.'\''.$mediaFileWithPath.'\'> /dev/null 2>&1 &';
+            $mpvRunLine = mpvNixBinary.' --input-ipc-server='.mpvNixSocketName.' '.otherParams.' \''.$mediaFileWithPath.'\'> /dev/null 2>&1 &';
         }
+        
         
         // $output=null;
         // $retval=null;

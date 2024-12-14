@@ -1,0 +1,5 @@
+#!/bin/bash
+bindIp=0.0.0.0
+Port=8080
+echo "Starting php web server ..."
+php --server "$bindIp:$Port" -t .

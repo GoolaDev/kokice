@@ -6,3 +6,4 @@
 /web/_playedmedia.txt
 /web/media/*
 !/web/media/README.md
+/.vscode/settings.json
