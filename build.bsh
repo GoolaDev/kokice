@@ -1,0 +1,2 @@
+#!/bin/bash
+dart compile js -O2 -o ./web/kokice.dart.js ./web/kokice.dart

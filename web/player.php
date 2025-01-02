@@ -70,8 +70,8 @@
     
     function inputFilter($inputString) // php pattern goes inside  /[ ]/
     {
-        $pattern = '/[\\w\\(\\)\\.\\-`,]/'; //allow alphanumeric characters plus underscore,"().-`"
-        // Allowed: word_char ( ) . - , '
+        $pattern = '/[\\w\\(\\)\\.\\-,]/'; //allow alphanumeric characters plus _,(),.,-,
+        
         if (strcontains($inputString, '..')) return false;
         for ($i = 0; $i < strlen($inputString) && $i<80 ; $i++)
         {
@@ -156,7 +156,7 @@
         echo '<div id="MediaListContainer">';
         foreach ($filesArray as &$fileName)
         {
-            if (!inputFilter($fileName)) statusReport(badInputMsg.$fileName,true); //protect
+            if (!inputFilter($fileName)) continue;
             if (strcontains( strtolower($fileName),'readme') ) continue;
             echo "$fileName<br>";
         }
@@ -179,7 +179,7 @@
         else
         {   // nix
             killMpvNix();
-            $mpvRunLine = mpvNixBinary.' --input-ipc-server='.mpvNixSocketName.' '.otherParams.' \''.$mediaFileWithPath.'\'> /dev/null 2>&1 &';
+            $mpvRunLine = mpvNixBinary.' --input-ipc-server='.mpvNixSocketName.' '.otherParams.' "'.$mediaFileWithPath.'"> /dev/null 2>&1 &';
         }
         
         // $output=null;

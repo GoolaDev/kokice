@@ -10,29 +10,19 @@
     const pathToMedia = '../media/';
     if (!file_exists(pathToMedia)) { echo "<p><strong>Path does not exist ! </strong></p>"; die(1); }
 
-    function checkAndFix($fileNameOld)
+    function inputFilter($inputString) // php pattern goes inside  /[ ]/
     {
         $pattern = '/[\\w\\(\\)\\.\\-,]/'; //allow alphanumeric characters plus _,(),.,-,
-        $fileNameNew='';
-        $subChar = '_';
-        for ($i = 0; $i < strlen($fileNameOld) && $i<80 ; $i++)
+        
+        for ($i = 0; $i < strlen($inputString) && $i<80 ; $i++)
         {
-            $char = $fileNameOld[$i];
+            $char = $inputString[$i];
             $result = preg_match($pattern,$char);
-            if ($result)
-            {
-                $fileNameNew = $fileNameNew.$char;
-            }
-            else
-            {
-                $fileNameNew = $fileNameNew.$subChar;
-            }
+            if ($result) { continue; }
+            echo "<p>Bad Char: [". $char."]</p>";
+            //return false; // invalid input found !!!
         }
-        if ($fileNameOld!==$fileNameNew)
-        {
-            echo "<p><strong>$fileNameOld will be renamed</strong></p>";
-            rename(pathToMedia.$fileNameOld,pathToMedia.$fileNameNew);
-        }
+        return true; // filter passed OK!
     }
    
     $filesArray = array_diff( scandir(pathToMedia), array('.','..') );
@@ -40,8 +30,10 @@
     echo "<p>Fixing filenames: </p>";
     foreach ($filesArray as &$fileName)
     {
-        echo "<p>File: $fileName</p>";
-        checkAndFix($fileName);
+        echo "<p>Filename: $fileName</p>";
+        //echo "<p>";
+	    inputFilter($fileName);
+		//echo "</p>";
     }
     echo "<p>Done.</p>";
 ?>

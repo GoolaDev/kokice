@@ -18,6 +18,7 @@ After site loads, enter team names. For teams that are not used leave it blank!
 Blank means no chars whatsoever.To award a point to a team click the number next to it while
 holding Ctrl or Alt. **Ctrl+click decrements score (in case of a mistake). Alt+click increments it.**
 To undo last clicked number hold ctrl and click it again.
+Team name in green is the next team to play. To change it hold **shift and click on team name**.
 To see what media files have been played open  **./www/_playedmedia.txt**.
 The last entry in it, is the last one opened (by clicking a number).
 
@@ -27,7 +28,8 @@ with access to that IP:Port can browse to the http://ip:port/_playedmedia.txt an
 all the files previously launched via mpv player.
 One can also list all the media files from ./web/media.
 
-To compile kokice.dart from ./kokice folder run:
+To compile kokice.dart from ./kokice folder execute :
 dart compile js -O2 -o ./web/kokice.dart.js ./web/kokice.dart
 
-Issues:
+If you are on *Nix you can do: 
+chmod u+x build.bsh && ./build.bsh

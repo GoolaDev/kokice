@@ -51,7 +51,7 @@ void main() async
         var mediaListDocument = html.parse(mediaListFileDocument);
         String? mediaListContainer = mediaListDocument.body?.querySelector('#MediaListContainer')?.innerHtml;
         
-        if (mediaListContainer == null)   { throw "Could not get media list. Probaly web server issue.";  }
+        if (mediaListContainer == null)   { throw "Could not get media list. Probably web server issue.";  }
         if (mediaListContainer.isEmpty) { throw "Media List empty."; }
         
         mediaFilesList = mediaListContainer.split('<br>') ;
@@ -64,12 +64,21 @@ void main() async
 
         switchTeam();
         createButtons();
+        registerTeamNameInputsClickHandlers();
     }
 
     catch (error)
     {
         window.alert("Something's Wrong.\n${error.toString()}");   
     }
+}
+
+void registerTeamNameInputsClickHandlers()
+{
+    querySelector("#teamnameinput1")!.onClick.listen((MouseEvent event) { if (event.shiftKey) {activeTeam = 4; switchTeam();} });
+    querySelector("#teamnameinput2")!.onClick.listen((MouseEvent event) { if (event.shiftKey) {activeTeam = 1; switchTeam();} });            
+    querySelector("#teamnameinput3")!.onClick.listen((MouseEvent event) { if (event.shiftKey) {activeTeam = 2; switchTeam();} });
+    querySelector("#teamnameinput4")!.onClick.listen((MouseEvent event) { if (event.shiftKey) {activeTeam = 3; switchTeam();} });      
 }
 
 void createButtons()
@@ -125,7 +134,7 @@ void buttonsOnClickHandler(MouseEvent event) async
     
     try 
     { 
-        if (event.ctrlKey) // makes the button not clicked
+        if (event.ctrlKey) // undoes clicked button 
         {
             btnElement.classes.remove("button_off");
             btnElement.classes.add("button_on");
@@ -156,6 +165,6 @@ void buttonsOnClickHandler(MouseEvent event) async
     }
     catch (error)
     {
-        window.alert("NESHTO SHTEKA.\n${error.toString()}");
+        window.alert("AGGRRRrrr!!!.\n${error.toString()}");
     }   
 }
