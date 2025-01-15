@@ -7,6 +7,7 @@
 
 <body>
 <?php
+    const badInputMsg = "ERROR. BAD INPUT: ";
     const playedMediaFile = '_playedmedia.txt'; // in webroot
     const mpvWinBinary = '..\\bin\\mpv.exe';
     const mpvNixBinary = 'mpv';
@@ -14,11 +15,11 @@
     const mpvNixSocketName = '/tmp/mpvkviz.sock';
     const killCommand = "{ \"command\": [\"quit\",\"1\"] }\n";
     const pathToMedia = './media/';
-    const badInputMsg = "ERROR. BAD INPUT: ";
-    const otherParams = '--force-window --fs --fs-screen=1 --terminal=no --hwdec=auto --cuda-decode-device=auto';
-    //const otherParams = '--osc=no --force-window --fs --fs-screen=1 --terminal=no --hwdec=auto --cuda-decode-device=auto';
-    
-    
+    // --osd-playlist-entry=filename was added in mpv v0.39.0
+    //const paramsLine = '--osd-playlist-entry=filename --force-window --fs --fs-screen=1 --terminal=no --hwdec=auto --cuda-decode-device=auto ';
+    const paramsLine = '--force-window --fs --fs-screen=1 --terminal=no --hwdec=auto --cuda-decode-device=auto ';
+    const title='QUIZANJEEE';
+
     function exitScript()
     {
         echo "</body></html>";
@@ -118,7 +119,7 @@
         $dt = new DateTime("now",new DateTimeZone('UTC'));
         //$logLine = 'TimeStamp: '.$dt->format('Y-m-d_H:i:s').' Filename: '.$logMsg.PHP_EOL;
         $logLine = $logMsg.' #'.$dt->format('Y-m-d_H:i:s').'#'.PHP_EOL;
-        if (!fwrite($logFile, $logLine,150))
+        if (!fwrite($logFile, $logLine,500))
         {
             //header('Internal Server Error:500', true, 500);
             statusReport("FILE WRITE ERROR",false);
@@ -169,17 +170,17 @@
         if (!inputFilter($mediaName)) statusReport(badInputMsg.$mediaName,true);
         
         $mediaFileWithPath = pathToMedia.$mediaName;
-        
+        $otherParams = paramsLine.'--title="'.title.'"';
         if (!file_exists($mediaFileWithPath)) statusReport("MEDIA NOT FOUND. Media File: ".$mediaName,true);
         if (file_exists(mpvWinBinary))
         {   // Win
             killMpvWin();
-            $mpvRunLine='start "" /B '.mpvWinBinary.' --input-ipc-server='.mpvWinPipeName.' '.otherParams.' "'.$mediaFileWithPath.'"';
+            $mpvRunLine='start "" /B '.mpvWinBinary.' --input-ipc-server='.mpvWinPipeName.' '.$otherParams.' "'.$mediaFileWithPath.'"';
         }
         else
         {   // nix
             killMpvNix();
-            $mpvRunLine = mpvNixBinary.' --input-ipc-server='.mpvNixSocketName.' '.otherParams.' "'.$mediaFileWithPath.'"> /dev/null 2>&1 &';
+            $mpvRunLine = mpvNixBinary.' --input-ipc-server='.mpvNixSocketName.' '.$otherParams.' "'.$mediaFileWithPath.'"> /dev/null 2>&1 &';
         }
         
         // $output=null;
