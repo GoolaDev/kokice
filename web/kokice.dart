@@ -101,7 +101,7 @@ void switchTeam([bool forward = true])
          ((querySelector('#teamnameinput2') as InputElement).value!.isEmpty) &&
          ((querySelector('#teamnameinput3') as InputElement).value!.isEmpty) &&
          ((querySelector('#teamnameinput4') as InputElement).value!.isEmpty) 
-    ) return; 
+    ) { return; }
 
     const String activeColor = "green";
     const String inactiveColor = "red";
